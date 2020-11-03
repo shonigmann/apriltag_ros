@@ -506,8 +506,9 @@ Eigen::Matrix4d TagDetector::getRelativeTransform(
   cv::Matx33d R;
   cv::Rodrigues(rvec, R);
   Eigen::Matrix3d wRo;
-  wRo << R(0,0), R(0,1), R(0,2), R(1,0), R(1,1), R(1,2), R(2,0), R(2,1), R(2,2);
-
+  // y, z ,x
+  wRo << -R(0,0), -R(0,1), -R(0,2), -R(1,0), -R(1,1), -R(1,2), R(2,0), R(2,1), R(2,2);
+  printf("%f , %f , %f\n" ,R(0,0), R(0,1), R(0,2));
   Eigen::Matrix4d T; // homogeneous transformation matrix
   T.topLeftCorner(3, 3) = wRo;
   T.col(3).head(3) <<
@@ -524,13 +525,14 @@ geometry_msgs::PoseWithCovarianceStamped TagDetector::makeTagPose(
   geometry_msgs::PoseWithCovarianceStamped pose;
   pose.header = header;
   //===== Position and orientation
-  pose.pose.pose.position.x    = transform(0, 3);
-  pose.pose.pose.position.y    = transform(1, 3);
-  pose.pose.pose.position.z    = transform(2, 3);
-  pose.pose.pose.orientation.x = rot_quaternion.x();
-  pose.pose.pose.orientation.y = rot_quaternion.y();
-  pose.pose.pose.orientation.z = rot_quaternion.z();
-  pose.pose.pose.orientation.w = rot_quaternion.w();
+  pose.pose.pose.position.x    = transform(2, 3);
+  pose.pose.pose.position.y    = -transform(0, 3);
+  pose.pose.pose.position.z    = -transform(1, 3);
+
+  pose.pose.pose.orientation.x = rot_quaternion.z();
+  pose.pose.pose.orientation.y = rot_quaternion.x();
+  pose.pose.pose.orientation.z = rot_quaternion.y();
+  pose.pose.pose.orientation.w = -rot_quaternion.w();
   return pose;
 }
 
