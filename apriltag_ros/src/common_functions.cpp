@@ -508,7 +508,6 @@ Eigen::Matrix4d TagDetector::getRelativeTransform(
   Eigen::Matrix3d wRo;
   // y, z ,x
   wRo << -R(0,0), -R(0,1), -R(0,2), -R(1,0), -R(1,1), -R(1,2), R(2,0), R(2,1), R(2,2);
-  printf("%f , %f , %f\n" ,R(0,0), R(0,1), R(0,2));
   Eigen::Matrix4d T; // homogeneous transformation matrix
   T.topLeftCorner(3, 3) = wRo;
   T.col(3).head(3) <<
