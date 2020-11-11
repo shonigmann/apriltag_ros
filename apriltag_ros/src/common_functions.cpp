@@ -531,7 +531,7 @@ geometry_msgs::PoseWithCovarianceStamped TagDetector::makeTagPose(
   pose.pose.pose.orientation.x = rot_quaternion.z();
   pose.pose.pose.orientation.y = rot_quaternion.x();
   pose.pose.pose.orientation.z = rot_quaternion.y();
-  pose.pose.pose.orientation.w = -rot_quaternion.w();
+  pose.pose.pose.orientation.w = rot_quaternion.w();
   return pose;
 }
 
