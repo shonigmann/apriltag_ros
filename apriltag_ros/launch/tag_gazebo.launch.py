@@ -11,11 +11,16 @@ cfg_16h5 = {
  
 }
 
+image_topic_ = "/image_raw"
+camera_name = "/rgb_camera"
+image_topic = camera_name + image_topic_
+info_topic = camera_name + "/camera_info"
+
 def generate_launch_description():
     composable_node = ComposableNode(
         name='apriltag',
         package='apriltag_ros', plugin='AprilTagNode',
-        remappings=[("/apriltag/image", "/rgb_camera/image_raw"), ("/apriltag/camera_info", "/rgb_camera/camera_info")],
+        remappings=[("/apriltag/image", image_topic), ("/apriltag/camera_info", info_topic)],
         parameters=[cfg_16h5])
     container = ComposableNodeContainer(
         name='tag_container',
