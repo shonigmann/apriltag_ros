@@ -145,7 +145,6 @@ void AprilTagNode::removeDuplicates(zarray_t* detections_ ){
 
 void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_img, const sensor_msgs::msg::CameraInfo::ConstSharedPtr& msg_ci) {
     // copy camera intrinsics
-    //std::memcpy(K.data(), msg_ci->k.data(), 9*sizeof(double));
 
     // convert to 8bit monochrome image
     const cv::Mat img_uint8 = cv_bridge::toCvShare(msg_img, "mono8")->image;
@@ -187,7 +186,7 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
 
         std::vector<cv::Point3d > standaloneTagObjectPoints;
         std::vector<cv::Point2d > standaloneTagImagePoints;
-        addObjectPoints(tag_sizes.count(det->id)/2, cv::Matx44d::eye(), standaloneTagObjectPoints);
+        addObjectPoints((tag_sizes.count(det->id) ? tag_sizes.at(det->id) : tag_edge_size)/2, cv::Matx44d::eye(), standaloneTagObjectPoints);
         addImagePoints(det, standaloneTagImagePoints);
         Eigen::Matrix4d transform = getRelativeTransform(standaloneTagObjectPoints,
                                                         standaloneTagImagePoints,
@@ -259,7 +258,7 @@ Eigen::Matrix4d AprilTagNode::getRelativeTransform(
   cv::Rodrigues(rvec, R);
   Eigen::Matrix3d wRo;
   // y, z ,x
-  wRo << -R(0,0), -R(0,1), -R(0,2), -R(1,0), -R(1,1), -R(1,2), R(2,0), R(2,1), R(2,2);
+  wRo << R(0,0), R(0,1), R(0,2), R(1,0), R(1,1), R(1,2), R(2,0), R(2,1), R(2,2);
   Eigen::Matrix4d T; // homogeneous transformation matrix
   T.topLeftCorner(3, 3) = wRo;
   T.col(3).head(3) <<
@@ -276,13 +275,13 @@ geometry_msgs::msg::TransformStamped AprilTagNode::makeTagPose(
   geometry_msgs::msg::TransformStamped tf_;
   tf_.header = header;
   //===== Position and orientation
-  tf_.transform.translation.x    = transform(2, 3);
-  tf_.transform.translation.y    = -transform(0, 3);
-  tf_.transform.translation.z    = -transform(1, 3);
+  tf_.transform.translation.x    = transform(0, 3);
+  tf_.transform.translation.y    = transform(1, 3);
+  tf_.transform.translation.z    = transform(2, 3);
 
-  tf_.transform.rotation.x = rot_quaternion.z();
-  tf_.transform.rotation.y = rot_quaternion.x();
-  tf_.transform.rotation.z = rot_quaternion.y();
+  tf_.transform.rotation.x = rot_quaternion.x();
+  tf_.transform.rotation.y = rot_quaternion.y();
+  tf_.transform.rotation.z = rot_quaternion.z();
   tf_.transform.rotation.w = rot_quaternion.w();
   return tf_;
 }
