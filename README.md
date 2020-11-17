@@ -1,4 +1,4 @@
-# apriltag_ros
+# apriltag_ros ROS2 Node
 
 `apriltag_ros` is a Robot Operating System (ROS) wrapper of the [AprilTag 3 visual fiducial detector](https://april.eecs.umich.edu/software/apriltag.html). For details and tutorials, please see the [ROS wiki](http://wiki.ros.org/apriltag_ros).
 
@@ -12,15 +12,13 @@
 
 Starting with a working ROS installation (Kinetic and Melodic are supported):
 ```
-export ROS_DISTRO=melodic               # Set this to your distro, e.g. kinetic or melodic
-source /opt/ros/$ROS_DISTRO/setup.bash  # Source your ROS distro 
-mkdir -p ~/catkin_ws/src                # Make a new workspace 
-cd ~/catkin_ws/src                      # Navigate to the source space
+mkdir -p ~/apriltag_ros2_ws/src                # Make a new workspace 
+cd ~/apriltag_ros2_ws/src                      # Navigate to the source space
 git clone https://github.com/AprilRobotics/apriltag.git      # Clone Apriltag library
-git clone https://github.com/AprilRobotics/apriltag_ros.git  # Clone Apriltag ROS wrapper
-cd ~/catkin_ws                          # Navigate to the workspace
+git clone https://github.com/H-HChen/apriltag_ros.git -b foxy-devel   # Clone Apriltag ROS wrapper
+cd ..               
 rosdep install --from-paths src --ignore-src -r -y  # Install any missing packages
-catkin build    # Build all packages in the workspace (catkin_make_isolated will work also)
+colcon build --symlink-install    # Build all packages in the workspace (catkin_make_isolated will work also)
 ```
 See the [ROS wiki](http://wiki.ros.org/apriltag_ros) for details and tutorials.
 
