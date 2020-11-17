@@ -19,3 +19,7 @@ rosdep install --from-paths src --ignore-src -r -y  # Install any missing packag
 colcon build --symlink-install    # Build all packages in the workspace (catkin_make_isolated will work also)
 ```
 See the [ROS wiki](http://wiki.ros.org/apriltag_ros) for details and tutorials.
+
+trouble shooting:
+
+https://github.com/cggos/dip_cvqt/issues/1
