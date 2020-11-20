@@ -16,7 +16,7 @@ git clone https://github.com/AprilRobotics/apriltag.git      # Clone Apriltag li
 git clone https://github.com/H-HChen/apriltag_ros.git -b foxy-devel   # Clone Apriltag ROS wrapper
 cd ..               
 rosdep install --from-paths src --ignore-src -r -y  # Install any missing packages
-colcon build --symlink-install    # Build all packages in the workspace (catkin_make_isolated will work also)
+colcon build --symlink-install    # Build all packages in the workspace \
 ```
 See the [ROS wiki](http://wiki.ros.org/apriltag_ros) for details and tutorials.
 
