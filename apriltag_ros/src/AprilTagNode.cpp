@@ -11,9 +11,6 @@
 #include <tagCustom48h12.h>
 #include <tagStandard41h12.h>
 #include <tagStandard52h13.h>
-
-#include <Eigen/Dense>
-
 // create and delete functions for default tags
 #define TAG_CREATE(name) { #name, tag##name##_create },
 #define TAG_DESTROY(name) { #name, tag##name##_destroy },
@@ -50,16 +47,15 @@ AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)
     tag_edge_size(declare_parameter<double>("size", 2.0)),
     max_hamming(declare_parameter<int>("max_hamming", 0)),
     // topics
-    sub_cam(image_transport::create_camera_subscription(this, "image", std::bind(&AprilTagNode::onCamera, this, std::placeholders::_1, std::placeholders::_2), declare_parameter<std::string>("image_transport", "raw"), rmw_qos_profile_sensor_data)),
-    pub_tf(create_publisher<tf2_msgs::msg::TFMessage>("/tf", rclcpp::QoS(100)))
-    //pub_detections(create_publisher<apriltag_msgs::msg::AprilTagDetectionArray>("detections", rclcpp::QoS(1)))
+    sub_cam(image_transport::create_camera_subscription(this, "image", std::bind(&AprilTagNode::onCamera, this, std::placeholders::_1, std::placeholders::_2), declare_parameter<std::string>("image_transport", "raw"), rmw_qos_profile_sensor_data))
+    //pub_detections(create_publisher<apriltag_msgs::msg::AprilTagDetectionArray>("detections", rclcpp::QoS(10)))
 {
     td->quad_decimate = declare_parameter<float>("decimate", 1.0);
     td->quad_sigma =    declare_parameter<float>("blur", 0.0);
     td->nthreads =      declare_parameter<int>("threads", 4);
     td->debug =         declare_parameter<int>("debug", false);
     td->refine_edges =  declare_parameter<int>("refine-edges", true);
-
+    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(this,rclcpp::QoS(10));
     // get tag names, IDs and sizes
     const auto ids = declare_parameter<std::vector<int64_t>>("tag_ids", {});
     const auto frames = declare_parameter<std::vector<std::string>>("tag_frames", {});
@@ -172,8 +168,6 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
     std::vector<std::string > detection_names;
     //tag_detection_array.header = msg_img->header;
 
-    tf2_msgs::msg::TFMessage tfs;
-
     for (int i = 0; i < zarray_size(detections); i++) {
         apriltag_detection_t* det;
         zarray_get(detections, i, &det);
@@ -199,12 +193,11 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
         // 3D orientation and position
         // set child frame name by generic tag name or configured tag name
         tag_pose.child_frame_id = tag_frames.count(det->id) ? tag_frames.at(det->id) : std::string(det->family->name)+":"+std::to_string(det->id);
-
-        tfs.transforms.push_back(tag_pose);
+        tf_broadcaster_->sendTransform(tag_pose);
+        
     }
 
     //pub_detections->publish(msg_detections);
-    pub_tf->publish(tfs);
 
     apriltag_detections_destroy(detections);
 }
@@ -258,7 +251,7 @@ Eigen::Matrix4d AprilTagNode::getRelativeTransform(
   cv::Rodrigues(rvec, R);
   Eigen::Matrix3d wRo;
   // y, z ,x
-  wRo << R(0,0), R(0,1), R(0,2), R(1,0), R(1,1), R(1,2), R(2,0), R(2,1), R(2,2);
+  wRo << -R(0,0), -R(0,1), -R(0,2), -R(1,0), -R(1,1), -R(1,2), R(2,0), R(2,1), R(2,2);
   Eigen::Matrix4d T; // homogeneous transformation matrix
   T.topLeftCorner(3, 3) = wRo;
   T.col(3).head(3) <<
@@ -275,15 +268,25 @@ geometry_msgs::msg::TransformStamped AprilTagNode::makeTagPose(
   geometry_msgs::msg::TransformStamped tf_;
   tf_.header = header;
   //===== Position and orientation
-  tf_.transform.translation.x    = transform(0, 3);
-  tf_.transform.translation.y    = transform(1, 3);
-  tf_.transform.translation.z    = transform(2, 3);
+  tf_.transform.translation.x    = transform(2, 3);
+  tf_.transform.translation.y    = -transform(0, 3);
+  tf_.transform.translation.z    = -transform(1, 3);
 
-  tf_.transform.rotation.x = rot_quaternion.x();
-  tf_.transform.rotation.y = rot_quaternion.y();
-  tf_.transform.rotation.z = rot_quaternion.z();
+  tf_.transform.rotation.x = rot_quaternion.z();
+  tf_.transform.rotation.y = rot_quaternion.x();
+  tf_.transform.rotation.z = rot_quaternion.y();
   tf_.transform.rotation.w = rot_quaternion.w();
   return tf_;
+}
+int main(int argc, char** argv){
+    rclcpp::init(argc, argv);
+    auto tag_node = std::make_shared<AprilTagNode>() ;
+    rclcpp::Rate rate(30.0);
+    while (rclcpp::ok()){
+        rclcpp::spin_some(tag_node);
+        rate.sleep();
+    }
+    return 0;
 }
 
 #include <rclcpp_components/register_node_macro.hpp>

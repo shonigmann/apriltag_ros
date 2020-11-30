@@ -8,7 +8,6 @@ cfg_16h5 = {
     "family": "36h11",
     "size": 0.08,
     "max_hamming": 0,
- 
 }
 
 image_topic_ = "/image_raw"
@@ -20,7 +19,7 @@ def generate_launch_description():
     composable_node = ComposableNode(
         name='apriltag',
         package='apriltag_ros', plugin='AprilTagNode',
-        remappings=[("/apriltag/image", image_topic), ("/apriltag/camera_info", info_topic)],
+        remappings=[("/apriltag/image", "/rgb_camera/image_raw"), ("/apriltag/camera_info", "/rgb_camera/camera_info")],
         parameters=[cfg_16h5])
     container = ComposableNodeContainer(
         name='tag_container',
