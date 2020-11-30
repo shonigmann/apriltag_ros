@@ -8,6 +8,7 @@ cfg_16h5 = {
     "family": "36h11",
     "size": 0.08,
     "max_hamming": 0,
+    "threads": 4
 }
 
 image_topic_ = "/image_raw"
