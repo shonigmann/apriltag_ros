@@ -45,7 +45,7 @@ private:
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     
     bool remove_duplicates_ = true;
-
+    bool z_up ;
     // function pointer for tag family creation / destruction
     static const std::map<std::string, apriltag_family_t *(*)(void)> tag_create;
     const static std::map<std::string, void (*)(apriltag_family_t*)> tag_destroy;

@@ -15,7 +15,8 @@ param = {
     "family": "36h11",
     "size": 0.086,
     "max_hamming": 0,
-    "threads": 4
+    "threads": 4,
+    "z_up": True
 }
 image_topic_ = "/image_raw"
 camera_name = "/camera/color"

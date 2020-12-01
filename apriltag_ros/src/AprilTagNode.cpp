@@ -46,6 +46,8 @@ AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)
     tag_family(declare_parameter<std::string>("family", "36h11")),
     tag_edge_size(declare_parameter<double>("size", 2.0)),
     max_hamming(declare_parameter<int>("max_hamming", 0)),
+    z_up(declare_parameter<bool>("z_up", true)),
+    
     // topics
     sub_cam(image_transport::create_camera_subscription(this, "image", std::bind(&AprilTagNode::onCamera, this, std::placeholders::_1, std::placeholders::_2), declare_parameter<std::string>("image_transport", "raw"), rmw_qos_profile_sensor_data))
     //pub_detections(create_publisher<apriltag_msgs::msg::AprilTagDetectionArray>("detections", rclcpp::QoS(10)))
@@ -59,7 +61,7 @@ AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)
     // get tag names, IDs and sizes
     const auto ids = declare_parameter<std::vector<int64_t>>("tag_ids", {});
     const auto frames = declare_parameter<std::vector<std::string>>("tag_frames", {});
-
+    
     if(!frames.empty()) {
         if(ids.size()!=frames.size()) {
             throw std::runtime_error("Number of tag ids ("+std::to_string(ids.size())+") and frames ("+std::to_string(frames.size())+") mismatch!");
@@ -250,8 +252,10 @@ Eigen::Matrix4d AprilTagNode::getRelativeTransform(
   cv::Matx33d R;
   cv::Rodrigues(rvec, R);
   Eigen::Matrix3d wRo;
-  // y, z ,x
-  wRo << -R(0,0), -R(0,1), -R(0,2), -R(1,0), -R(1,1), -R(1,2), R(2,0), R(2,1), R(2,2);
+
+  if (z_up){wRo << R(1,0), R(1,1), R(1,2), R(2,0), R(2,1), R(2,2),R(0,0), R(0,1), R(0,2);}
+  else{wRo << R(0,0), R(0,1), R(0,2),R(1,0), R(1,1), R(1,2), R(2,0), R(2,1), R(2,2);}
+
   Eigen::Matrix4d T; // homogeneous transformation matrix
   T.topLeftCorner(3, 3) = wRo;
   T.col(3).head(3) <<
@@ -268,24 +272,30 @@ geometry_msgs::msg::TransformStamped AprilTagNode::makeTagPose(
   geometry_msgs::msg::TransformStamped tf_;
   tf_.header = header;
   //===== Position and orientation
-  tf_.transform.translation.x    = transform(2, 3);
-  tf_.transform.translation.y    = -transform(0, 3);
-  tf_.transform.translation.z    = -transform(1, 3);
+  tf_.transform.translation.x    = transform(0, 3);
+  tf_.transform.translation.y    = transform(1, 3);
+  tf_.transform.translation.z    = transform(2, 3);
 
-  tf_.transform.rotation.x = rot_quaternion.z();
-  tf_.transform.rotation.y = rot_quaternion.x();
-  tf_.transform.rotation.z = rot_quaternion.y();
+  if (z_up){
+    tf_.transform.rotation.x = rot_quaternion.z();
+    tf_.transform.rotation.y = rot_quaternion.x();
+    tf_.transform.rotation.z = rot_quaternion.y();
+  }
+  else{
+    tf_.transform.rotation.x = rot_quaternion.x();
+    tf_.transform.rotation.y = rot_quaternion.y();
+    tf_.transform.rotation.z = rot_quaternion.z();
+  }
+
   tf_.transform.rotation.w = rot_quaternion.w();
   return tf_;
 }
 int main(int argc, char** argv){
     rclcpp::init(argc, argv);
     auto tag_node = std::make_shared<AprilTagNode>() ;
-    rclcpp::Rate rate(30.0);
-    while (rclcpp::ok()){
-        rclcpp::spin_some(tag_node);
-        rate.sleep();
-    }
+
+    rclcpp::spin(tag_node);
+    
     return 0;
 }
 
