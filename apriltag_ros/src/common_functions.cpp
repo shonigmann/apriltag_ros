@@ -524,13 +524,13 @@ geometry_msgs::PoseWithCovarianceStamped TagDetector::makeTagPose(
   geometry_msgs::PoseWithCovarianceStamped pose;
   pose.header = header;
   //===== Position and orientation
-  pose.pose.pose.position.x    = transform(2, 3);
-  pose.pose.pose.position.y    = transform(0, 3);
-  pose.pose.pose.position.z    = transform(1, 3);
+  pose.pose.pose.position.x    = transform(0, 3);
+  pose.pose.pose.position.y    = transform(1, 3);
+  pose.pose.pose.position.z    = transform(2, 3);
 
-  pose.pose.pose.orientation.x = rot_quaternion.z();
-  pose.pose.pose.orientation.y = rot_quaternion.x();
-  pose.pose.pose.orientation.z = rot_quaternion.y();
+  pose.pose.pose.orientation.x = rot_quaternion.x();
+  pose.pose.pose.orientation.y = rot_quaternion.y();
+  pose.pose.pose.orientation.z = rot_quaternion.z();
   pose.pose.pose.orientation.w = rot_quaternion.w();
   return pose;
 }
