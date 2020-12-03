@@ -23,3 +23,14 @@ See the [ROS wiki](http://wiki.ros.org/apriltag_ros) for details and tutorials.
 trouble shooting:Could not load library LoadLibrary error: libopencv_imgcodecs.so.4.5
 
 https://github.com/cggos/dip_cvqt/issues/1
+
+##Usage
+
+Launch tag detection node 
+```
+ros2 launch apriltag_ros tag_realsense.launch.py camera_name:=/camera/color image_topic:=image_raw
+```
+###custom parameter
+modify config file in /apriltag_ros/apriltag_ros/cfg/
+
+you can also change config file to load in launch file.
