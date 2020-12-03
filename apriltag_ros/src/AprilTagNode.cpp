@@ -40,7 +40,7 @@ const std::map<std::string, void (*)(apriltag_family_t*)> AprilTagNode::tag_dest
 };
 
 AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)
-  : Node("apriltag", "apriltag", options.use_intra_process_comms(true)),
+  : Node( "apriltag", options.use_intra_process_comms(true)),
     // parameter
     td(apriltag_detector_create()),
     tag_family(declare_parameter<std::string>("family", "36h11")),
@@ -68,7 +68,6 @@ AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)
         }
         for(size_t i = 0; i<ids.size(); i++) { tag_frames[ids[i]] = frames[i]; }
     }
-
     const auto sizes = declare_parameter<std::vector<double>>("tag_sizes", {});
     if(!sizes.empty()) {
         // use tag specific size
@@ -77,7 +76,6 @@ AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)
         }
         for(size_t i = 0; i<ids.size(); i++) { tag_sizes[ids[i]] = sizes[i]; }
     }
-
     if(tag_create.count(tag_family)) {
         tf = tag_create.at(tag_family)();
         apriltag_detector_add_family(td, tf);
@@ -142,8 +140,6 @@ void AprilTagNode::removeDuplicates(zarray_t* detections_ ){
 }
 
 void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_img, const sensor_msgs::msg::CameraInfo::ConstSharedPtr& msg_ci) {
-    // copy camera intrinsics
-
     // convert to 8bit monochrome image
     const cv::Mat img_uint8 = cv_bridge::toCvShare(msg_img, "mono8")->image;
     
@@ -153,7 +149,6 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
         .stride = img_uint8.cols,
         .buf = img_uint8.data
     };
-
     image_geometry::PinholeCameraModel camera_model;
     camera_model.fromCameraInfo(msg_ci);
     double fx = camera_model.fx(); // focal length in camera x-direction [px]
@@ -169,11 +164,9 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
     //AprilTagDetectionArray tag_detection_array;
     std::vector<std::string > detection_names;
     //tag_detection_array.header = msg_img->header;
-
     for (int i = 0; i < zarray_size(detections); i++) {
         apriltag_detection_t* det;
         zarray_get(detections, i, &det);
-
         // ignore untracked tags
         if(!tag_frames.empty() && !tag_frames.count(det->id)) { continue; }
 
@@ -196,11 +189,8 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
         // set child frame name by generic tag name or configured tag name
         tag_pose.child_frame_id = tag_frames.count(det->id) ? tag_frames.at(det->id) : std::string(det->family->name)+":"+std::to_string(det->id);
         tf_broadcaster_->sendTransform(tag_pose);
-        
     }
-
     //pub_detections->publish(msg_detections);
-
     apriltag_detections_destroy(detections);
 }
 void AprilTagNode::addObjectPoints (
@@ -231,7 +221,6 @@ void AprilTagNode::addImagePoints (
         imagePoints.push_back(cv::Point2d(im_x, im_y));
     }
 }
-
 
 Eigen::Matrix4d AprilTagNode::getRelativeTransform(
     std::vector<cv::Point3d > objectPoints,
@@ -290,12 +279,11 @@ geometry_msgs::msg::TransformStamped AprilTagNode::makeTagPose(
   tf_.transform.rotation.w = rot_quaternion.w();
   return tf_;
 }
+
 int main(int argc, char** argv){
     rclcpp::init(argc, argv);
     auto tag_node = std::make_shared<AprilTagNode>() ;
-
     rclcpp::spin(tag_node);
-    
     return 0;
 }
 

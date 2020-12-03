@@ -1,35 +1,27 @@
 import launch
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
-from launch.substitutions import LaunchConfiguration
-from launch.launch_context import LaunchContext
-from launch import LaunchDescription
 import os
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import (DeclareLaunchArgument, GroupAction,
-                            IncludeLaunchDescription, SetEnvironmentVariable)
+from pathlib import Path
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
-# detect all 16h5 tags
-param = {
-    "image_transport": "raw",
-    "family": "36h11",
-    "size": 0.086,
-    "max_hamming": 0,
-    "threads": 4,
-    "z_up": True
-}
-image_topic_ = "/image_raw"
-camera_name = "/camera/color"
-image_topic = camera_name + image_topic_
-info_topic = camera_name + "/camera_info"
+image_topic_ = LaunchConfiguration('image_topic', default="image_raw")
+camera_name = LaunchConfiguration('camera_name', default="/camera/color")
+
+image_topic = [camera_name, '/', image_topic_]
+info_topic = [camera_name, "/camera_info"]
+config = os.path.join(get_package_share_directory('apriltag_ros'), 'cfg', 'tags_36h11_filter.yaml') 
 
 def generate_launch_description():
 
     composable_node = ComposableNode(
         name='apriltag',
         package='apriltag_ros', plugin='AprilTagNode',
-        remappings=[("/apriltag/image", image_topic ), ("/apriltag/camera_info",info_topic)],
-        parameters=[param])
+        remappings=[(
+            ("/image", image_topic), 
+            ("/camera_info", info_topic))],
+        parameters=[config])
 
     container = ComposableNodeContainer(
         name='tag_container',
