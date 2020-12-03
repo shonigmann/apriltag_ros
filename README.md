@@ -18,7 +18,6 @@ cd ..
 rosdep install --from-paths src --ignore-src -r -y  # Install any missing packages
 colcon build --symlink-install    # Build all packages in the workspace \
 ```
-See the [ROS wiki](http://wiki.ros.org/apriltag_ros) for details and tutorials.
 
 trouble shooting:Could not load library LoadLibrary error: libopencv_imgcodecs.so.4.5
 
