@@ -24,13 +24,13 @@ trouble shooting:Could not load library LoadLibrary error: libopencv_imgcodecs.s
 
 https://github.com/cggos/dip_cvqt/issues/1
 
-##Usage
+## Usage
 
 Launch tag detection node 
 ```
 ros2 launch apriltag_ros tag_realsense.launch.py camera_name:=/camera/color image_topic:=image_raw
 ```
-###custom parameter
+### Custom parameter
 modify config file in /apriltag_ros/apriltag_ros/cfg/
 
 you can also change config file to load in launch file.
