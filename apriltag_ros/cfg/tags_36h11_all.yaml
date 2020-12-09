@@ -12,6 +12,4 @@ z_up: true              # rotate about x-axis to have Z pointing upwards
 decimate: 1.0           # decimate resolution for quad detection
 blur: 1.0               # sigma of Gaussian blur for quad detection
 refine-edges: 1         # snap to strong gradients
-refine-decode: 0        # increase the number of detected tags
-refine-pose: 0          # increase the accuracy of the extracted pose
 debug: 0                # write additional debugging images to current working directory
