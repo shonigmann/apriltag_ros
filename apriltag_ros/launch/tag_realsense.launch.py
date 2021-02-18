@@ -18,10 +18,11 @@ def generate_launch_description():
     composable_node = ComposableNode(
         name='apriltag',
         package='apriltag_ros', plugin='AprilTagNode',
-        remappings=[(
+        parameters=[config],
+        remappings=[
             ("/image", image_topic), 
-            ("/camera_info", info_topic))],
-        parameters=[config])
+            ("/camera_info", info_topic)]
+    )
 
     container = ComposableNodeContainer(
         name='tag_container',

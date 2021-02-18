@@ -14,14 +14,14 @@ info_topic = [camera_name, "/camera_info"]
 config = os.path.join(get_package_share_directory('apriltag_ros'), 'cfg', 'tags_36h11_filter.yaml') 
 
 def generate_launch_description():
+    
     composable_node = ComposableNode(
         name='apriltag',
         package='apriltag_ros', plugin='AprilTagNode',
         parameters=[config],
         remappings=[
             ("/image", image_topic), 
-            ("/camera_info", info_topic)
-        ]
+            ("/camera_info", info_topic)]
     )
         
     container = ComposableNodeContainer(
