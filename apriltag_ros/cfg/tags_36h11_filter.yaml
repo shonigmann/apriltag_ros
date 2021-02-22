@@ -3,7 +3,7 @@
 #
 image_transport: 'raw'    # image format
 family: '36h11'           # tag family name
-size: 0.08
+size: 0.08                # default tag size
 threads: 4
 max_hamming: 0          # maximum allowed hamming distance (corrected bits)
 z_up: true              # rotate about x-axis to have Z pointing upwards
