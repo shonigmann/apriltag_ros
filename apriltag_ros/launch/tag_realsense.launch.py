@@ -11,7 +11,7 @@ camera_name = LaunchConfiguration('camera_name', default="/camera/color")
 
 image_topic = [camera_name, '/', image_topic_]
 info_topic = [camera_name, "/camera_info"]
-config = os.path.join(get_package_share_directory('apriltag_ros'), 'cfg', 'tags_36h11_filter.yaml') 
+config = os.path.join(get_package_share_directory('apriltag_ros'), 'cfg', 'tags_36h11_all.yaml') 
 
 def generate_launch_description():
 
