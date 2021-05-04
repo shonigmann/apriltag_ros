@@ -32,8 +32,8 @@ set(DEPENDENCIES "rclcpp" "rclcpp_components" "geometry_msgs" "apriltag_msgs"
 ament_target_dependencies(AprilTagNode ${DEPENDENCIES})
 ament_target_dependencies(tag_detector ${DEPENDENCIES})
 
-target_link_libraries(AprilTagNode apriltag::apriltag)
-target_link_libraries(tag_detector apriltag::apriltag)
+target_link_libraries(AprilTagNode apriltag)
+target_link_libraries(tag_detector apriltag)
 
 
 rclcpp_components_register_nodes(AprilTagNode "AprilTagNode")

@@ -165,6 +165,7 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
     apriltag_msgs::msg::AprilTagDetectionArray tag_detection_array;
     std::vector<std::string > detection_names;
     tag_detection_array.header = msg_img->header;
+    
     for (int i = 0; i < zarray_size(detections); i++) {
         apriltag_detection_t* det;
         zarray_get(detections, i, &det);
@@ -174,6 +175,8 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
         // reject detections with more corrected bits than allowed
         if(det->hamming>max_hamming) { continue; }
 
+        // TODO: determine if tag is in a bundle
+        
         std::vector<cv::Point3d > standaloneTagObjectPoints;
         std::vector<cv::Point2d > standaloneTagImagePoints;
         double tag_half_size = (tag_sizes.count(det->id) ? tag_sizes.at(det->id) : tag_edge_size)/2;
@@ -202,6 +205,11 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
         tag_detection.size = tag_half_size*2;
         tag_detection_array.detections.push_back(tag_detection);
     }
+    
+    //=================================================================
+    // TODO: Estimate bundle origin pose for each bundle in which at least one
+    // member tag was detected, and pushback bundle detections
+    
     pub_detections->publish(tag_detection_array);
     apriltag_detections_destroy(detections);
 }
