@@ -1,5 +1,5 @@
 family: 25h9            # tag family, one of 16h5, 25h7, 25h9, 36h10, 36h11, 36artoolkit
-size: 0.04666666667             # tag edge size in meter
+#size: 0.0777778             # tag edge size in meter
 max_hamming: 0          # maximum allowed hamming distance (corrected bits)
 z_up: true              # rotate about x-axis to have Z pointing upwards
 
@@ -7,10 +7,11 @@ z_up: true              # rotate about x-axis to have Z pointing upwards
 decimate: 1.0           # decimate resolution for quad detection
 blur: 0.0               # sigma of Gaussian blur for quad detection
 refine-edges: 1         # snap to strong gradients
-threads: 1              # number of threads
+threads: 2              # number of threads
 debug: 0                # write additional debugging images to current working directory
 
 # optional list of tags
-tag_ids: [0, 1, 2, 3, 4, 5]            # tag ID
-# tag_frames: [base, object]  # optional frame name
-# tag_sizes: [0.162, 0.162]   # optional tag-specific edge size
+tag_ids: [ 1, 2, 3, 4, 5, 6, 7, 8]            # tag ID
+#tag_frames: [tag25_9_00001_link , tag25_9_00002_link,tag25_9_00003_link,tag25_9_00005_link]  # optional frame name
+tag_sizes: [0.05444, 0.05444, 0.05444, 0.05444, 0.0233, 0.0233, 0.0233, 0.0233]   # optional tag-specific edge size
+use_sim_time: true
